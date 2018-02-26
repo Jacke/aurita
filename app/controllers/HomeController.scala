@@ -47,6 +47,11 @@ class HomeController(
     case Mode.Test => assets.at("public/javascripts", file)
   }
 
+  def root() = silhouette.UserAwareAction.async {
+    implicit request: Request[AnyContent] => Future { Redirect("/app") }
+  }
+
+
   /**
    * Create an Action to render an HTML page.
    *

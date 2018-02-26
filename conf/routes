@@ -3,7 +3,8 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-# An example controller showing a sample home page
+GET  /                              aurita.controllers.HomeController.root()
+
 GET  /app/*pathname                 aurita.controllers.HomeController.index(pathname: String)
 
 GET  /app                           aurita.controllers.HomeController.index0()
