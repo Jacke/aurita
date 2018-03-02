@@ -51,6 +51,7 @@ class AppComponents(context: Context) extends AuritaSlickComponents(context)
   import _root_.controllers.Assets
   import _root_.router.Routes
   import aurita.controllers.HomeController
+  import aurita.controllers.MapPositionConroller
   import aurita.controllers.auth.{
     ForgotPasswordController, SignInController, SignUpController
   }
@@ -70,6 +71,7 @@ class AppComponents(context: Context) extends AuritaSlickComponents(context)
   implicit val myConfiguration: Configuration = configuration
   lazy val authControllerDAO: AuthControllerDAO = wire[AuthControllerDAOImpl]
   lazy val homeController: HomeController = wire[HomeController]
+  lazy val mapPositionController: MapPositionConroller = wire[MapPositionConroller]
   lazy val forgotPasswordController: ForgotPasswordController =
     wire[ForgotPasswordController]
   lazy val signInController: SignInController = wire[SignInController]
