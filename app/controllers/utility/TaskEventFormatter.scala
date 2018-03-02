@@ -67,4 +67,10 @@ object TaskEventFormatter {
     TaskEvent, TaskEvent
   ] = MessageFlowTransformer.jsonMessageFlowTransformer[TaskEvent, TaskEvent]
 
+  implicit def mapPositionFrameFormatter: MessageFlowTransformer[
+    JsValue, JsValue
+  ] = MessageFlowTransformer.jsonMessageFlowTransformer[JsValue, JsValue]
+
+
 }
+

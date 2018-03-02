@@ -4,6 +4,7 @@ import play.api.mvc.{
   AbstractController, Action, AnyContent, ControllerComponents, Request, WebSocket
 }
 import play.api.Environment
+import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import com.softwaremill.tagging.@@
 import akka.actor.ActorSystem
@@ -73,13 +74,12 @@ class HomeController(
   def stream() = {
     import aurita.actors.utility.TaskProtocol.TaskEvent
     import aurita.controllers.utility.TaskEventFormatter._
-
-    WebSocket.accept[TaskEvent, TaskEvent] { _ => _getActorFlow(userId = 0L) }
+    WebSocket.accept[JsValue, JsValue] { _ => _getActorFlow(userId = 0L) }
   }
 
   private def _getActorFlow(userId: Long) = {
     implicit val actorSystem: ActorSystem @@ MainActorSystemTag = system
-    ActorFlow.actorRef(out => socketClientFactory.socketClientProps(userId = userId))
+    ActorFlow.actorRef(out => socketClientFactory.socketClientProps(userId = userId, actorSystem, out))
   }
 
 }
