@@ -20,6 +20,10 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true  
   },
+  "types": [
+    "googlemaps",
+    "markerclustererplus"
+  ],  
   "include": [
     "./src/**/*"
   ],
