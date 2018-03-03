@@ -101,22 +101,22 @@ trait MapPositionDAOInterface extends DAOHelpers {
     def lat =
       column[Double]("LAT", O.Length(length = 32, varying = true))
 
-    def lon =
-      column[Double]("LON", O.Length(length = 32, varying = true))
+    def lng =
+      column[Double]("LNG", O.Length(length = 32, varying = true))
 
 
     def * = (
       id.?,
       userId,
       lat,
-      lon
+      lng
     ) <> ((MapPosition.apply _).tupled, MapPosition.unapply)
 
     def ? = (
       id.?,
       userId,
       lat,
-      lon
+      lng
     ).shaped <> (
       {
         r =>

@@ -50,14 +50,14 @@ class MapPositionConroller(
     }
   }
 
-  def savePoisition(lat: Double, lon: Double) = Action.async {
+  def savePoisition(lat: Double, lng: Double) = Action.async {
     implicit rs => 
     db.run(mapPositionDAO.getMapPosition()).flatMap { positionOpt =>
       positionOpt match {
-        case Some(position) => db.run(mapPositionDAO.updateMapPosition(position.copy(lat = lat, lon = lon))).map { _ =>
+        case Some(position) => db.run(mapPositionDAO.updateMapPosition(position.copy(lat = lat, lng = lng))).map { _ =>
           Ok(Json.toJson(Map("status" -> "ok")))
         }
-        case _ => db.run(mapPositionDAO.createMapPosition(DEFAULT_POSITION.copy(lat = lat, lon = lon))).map { _ =>
+        case _ => db.run(mapPositionDAO.createMapPosition(DEFAULT_POSITION.copy(lat = lat, lng = lng))).map { _ =>
           Ok(Json.toJson(Map("status" -> "ok")))
         }
       }      

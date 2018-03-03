@@ -37,7 +37,7 @@ class SocketClient(userId: Long, system: ActorSystem, out: ActorRef) extends Act
       logger.info(s"${self.path} received message: ${payload}.")
       if (payload.asOpt[MapPosition].isDefined) {
         val position = payload.as[MapPosition]
-        system.actorSelection("akka://application/user/*/flowActor") ! MapPositionStatus(status = "updated", position.lat, position.lon)
+        system.actorSelection("akka://application/user/*/flowActor") ! MapPositionStatus(status = "updated", position.lat, position.lng)
       }
     }
 

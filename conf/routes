@@ -5,7 +5,8 @@
 
 GET  /api/v1/mapPosition            aurita.controllers.MapPositionConroller.mainPosition()
 
-GET  /api/v1/mapPosition/:lat/:lon  aurita.controllers.MapPositionConroller.savePoisition(lat: Double, lon: Double)
++ nocsrf
+POST /api/v1/mapPosition/:lat/:lng  aurita.controllers.MapPositionConroller.savePoisition(lat: Double, lng: Double)
 
 GET  /                              aurita.controllers.HomeController.root()
 

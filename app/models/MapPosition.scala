@@ -12,11 +12,11 @@ import aurita.models.utility.Common
   * @param id the primary key
   * @param userId
   * @param lat latitude
-  * @param lon longitude
+  * @param lng longitude
   */
-case class MapPosition(id: Option[Long], userId: Option[Long] = Some(0L), lat: Double, lon: Double) 
+case class MapPosition(id: Option[Long], userId: Option[Long] = Some(0L), lat: Double, lng: Double) 
   extends Common[MapPosition] {}
-case class MapPositionStatus(status: String, lat: Double, lon: Double)
+case class MapPositionStatus(status: String, lat: Double, lng: Double)
 
 
 object MapPositionStatus {
