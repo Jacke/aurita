@@ -63,10 +63,10 @@ trait LoginInfoDAOSpecHelper extends TestEnvironment {
     def init() = {}
   }
 
-  implicit val ec: ExecutionContext = ExecutionContext.global
+  implicit val executionContext: ExecutionContext = ExecutionContext.global
 
   class WithDepsApplication()(
-    implicit val ec: ExecutionContext
+    implicit val executionContext: ExecutionContext
   ) extends TestApplication with TestData
 }
 
