@@ -1,12 +1,17 @@
 import * as React from 'react';
 import './App.css';
-const defaultLatLng = {lat: -25.363, lng: 131.044}
 import GMap from './GMap'
 import axios from 'axios';
 
+export interface MapPosition {
+    lat: number;
+    lng: number;
+}
+const defaultLatLng:MapPosition = {lat: -25.363, lng: 131.044}
+
 interface State {
-  localPosition: any;
-  globalPosition: any;
+  localPosition: MapPosition;
+  globalPosition: MapPosition;
 }
 interface Props {}
 
@@ -15,10 +20,10 @@ class App extends React.Component<Props, State> {
 
   constructor(props: any) {
     super(props);
-    this.state = {localPosition: {}, globalPosition: {} };
+    this.state = {localPosition: {lat: 0, lng: 0}, globalPosition: {lat: 0, lng: 0} };
     this.connection = new WebSocket('ws://localhost:9000/stream');
     this.connection.onmessage = (evt:any) => { 
-      let newPosition = JSON.parse(evt.data)
+      let newPosition:MapPosition = JSON.parse(evt.data)
       // Update position from websocket only if client has the old position
       if (this.state.localPosition.lat != newPosition.lat && this.state.localPosition.lng != newPosition.lng) {
         this.setState({localPosition: {lat: newPosition.lat, lng: newPosition.lng},
@@ -29,10 +34,7 @@ class App extends React.Component<Props, State> {
 
   componentDidMount() {
     axios.get(`/api/v1/mapPosition`)
-      .then(res => {
-        console.log('res: ', res);
-        this.setState({localPosition: res.data, globalPosition: res.data })
-    });
+      .then(res => this.setState({localPosition: res.data, globalPosition: res.data }));
   }
 
   handleSave = (e: any) => {
@@ -47,7 +49,7 @@ class App extends React.Component<Props, State> {
   }
 
   handleDefault = (e: any) => this.setState(prevState => ({localPosition: defaultLatLng, globalPosition: defaultLatLng }))
-  _onChange = (e: object) => this.setState({localPosition: e })
+  _onChange = (e: MapPosition) => this.setState({localPosition: e })
 
 
   render() {

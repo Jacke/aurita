@@ -1,25 +1,28 @@
 import * as React from 'react';
 import {GoogleMap, withGoogleMap, withScriptjs} from 'react-google-maps'
+import {MapPosition} from './App';
 import { compose, 
          withProps, 
          withState, 
          withHandlers } from "recompose";
 interface GMapProps {
   onChange: any;
-  localPosition: any;
-  globalPosition: any;
-  defaultLatLng: any;
+  localPosition: MapPosition;
+  globalPosition: MapPosition;
+  defaultLatLng: MapPosition;
+  ref?:any;
+  onMapMounted?:any;
 }
 interface GMapState {localPosition: any}
 
 export const GOOGLE_MAP_URL = 'https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyBDdi6FWp1FF-aUJtE8DZyPJAlLtMMNwkE'
 
 export default class GMap extends React.Component<GMapProps, GMapState> {
-  constructor(props: any) {
+  constructor(props: GMapProps) {
     super(props);
     this.state = {localPosition: this.props.defaultLatLng};
   }   
-  shouldComponentUpdate(nextProps:any, nextState:any) {
+  shouldComponentUpdate(nextProps: GMapProps, nextState: GMapState) {
     if ((nextProps.globalPosition == this.props.defaultLatLng && nextProps.localPosition == this.props.defaultLatLng) 
       || nextProps.globalPosition != this.props.globalPosition) {
       return true;
@@ -28,7 +31,7 @@ export default class GMap extends React.Component<GMapProps, GMapState> {
   }
 
   render() {
-    const MyGoogleMap:React.ComponentClass<any> = compose<any,any>(
+    const MyGoogleMap:React.ComponentClass<any> = compose<GMapProps, GMapState>(
         withProps({
           googleMapURL: GOOGLE_MAP_URL,
           loadingElement: <div style={{ height: `100%` }} />,
@@ -41,7 +44,7 @@ export default class GMap extends React.Component<GMapProps, GMapState> {
           const refs = { map: undefined, }
           return {
             onMapMounted: () => (ref:any) => { refs.map = ref },
-            onChange: (props:any) => () => {
+            onChange: (props: GMapProps) => () => {
                 const map:any = refs.map
                 let lat = map.getCenter().lat()
                 let lng = map.getCenter().lng()
