@@ -33,13 +33,13 @@ class App extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    axios.get(`/api/v1/mapPosition`)
+    axios.get(`http://localhost:9000/api/v1/mapPosition`)
       .then(res => this.setState({localPosition: res.data, globalPosition: res.data }));
   }
 
   handleSave = (e: any) => {
     this.connection.send(JSON.stringify(this.state.localPosition));
-    axios.post(`/api/v1/mapPosition/${this.state.localPosition.lat}/${this.state.localPosition.lng}`, {})
+    axios.post(`http://localhost:9000/api/v1/mapPosition/${this.state.localPosition.lat}/${this.state.localPosition.lng}`, {})
     .then(function (response) {
       console.log(response);
     })
