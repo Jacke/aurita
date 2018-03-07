@@ -26,7 +26,7 @@ class App extends React.Component<Props, State> {
       const WebSocket = {}; 
       console.log('Fallback for jest', WebSocket);
     } else {
-      this.connection = new WebSocket('ws://localhost:9000/stream');
+      this.connection = new WebSocket('ws://localhost:9002/stream');
       this.connection.onmessage = (evt:any) => { 
         let newPosition:MapPosition = JSON.parse(evt.data)
         // Update position from websocket only if client has the old position
