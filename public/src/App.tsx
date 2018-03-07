@@ -2,6 +2,7 @@ import * as React from 'react';
 import './App.css';
 import GMap from './GMap'
 import axios from 'axios';
+//import * as WebSocket from 'ws'
 
 export interface MapPosition {
     lat: number;
@@ -21,25 +22,34 @@ class App extends React.Component<Props, State> {
   constructor(props: any) {
     super(props);
     this.state = {localPosition: {lat: 0, lng: 0}, globalPosition: {lat: 0, lng: 0} };
-    this.connection = new WebSocket('ws://localhost:9000/stream');
-    this.connection.onmessage = (evt:any) => { 
-      let newPosition:MapPosition = JSON.parse(evt.data)
-      // Update position from websocket only if client has the old position
-      if (this.state.localPosition.lat != newPosition.lat && this.state.localPosition.lng != newPosition.lng) {
-        this.setState({localPosition: {lat: newPosition.lat, lng: newPosition.lng},
-                      globalPosition: {lat: newPosition.lat, lng: newPosition.lng} });
-      }
-    };    
+    if (WebSocket == undefined) {
+      const WebSocket = {}; 
+      console.log('Fallback for jest', WebSocket);
+    } else {
+      this.connection = new WebSocket('ws://localhost:9000/stream');
+      this.connection.onmessage = (evt:any) => { 
+        let newPosition:MapPosition = JSON.parse(evt.data)
+        // Update position from websocket only if client has the old position
+        if (this.state.localPosition.lat != newPosition.lat && this.state.localPosition.lng != newPosition.lng) {
+          this.setState({localPosition: {lat: newPosition.lat, lng: newPosition.lng},
+                        globalPosition: {lat: newPosition.lat, lng: newPosition.lng} });
+        }
+      };    
+    }
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:9000/api/v1/mapPosition`)
-      .then(res => this.setState({localPosition: res.data, globalPosition: res.data }));
+    return axios.get(`/api/v1/mapPosition`)
+      .then(res => {
+        this.setState({localPosition: res.data, globalPosition: res.data });
+      }).catch(error => {
+        console.log(error);
+      });
   }
 
   handleSave = (e: any) => {
     this.connection.send(JSON.stringify(this.state.localPosition));
-    axios.post(`http://localhost:9000/api/v1/mapPosition/${this.state.localPosition.lat}/${this.state.localPosition.lng}`, {})
+    axios.post(`/api/v1/mapPosition/${this.state.localPosition.lat}/${this.state.localPosition.lng}`, {})
     .then(function (response) {
       console.log(response);
     })
