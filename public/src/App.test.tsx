@@ -21,7 +21,9 @@ it('renders without crashing', () => {
   ReactDOM.render(<App />, div);
 
   console.log('app.state', app, app.state());
-  console.log(App.prototype.componentDidMount().then(c => 
-      setTimeout(console.log('app.state', app, app.state()), 85000)));
+  /*
+    console.log(App.prototype.componentDidMount().then(c => 
+        setTimeout(console.log('app.state', app, app.state()), 85000)));
+  */
   expect(app.length).toEqual(1);
 });

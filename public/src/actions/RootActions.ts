@@ -1,10 +1,12 @@
 import { createAction } from 'typesafe-actions';
 import {RouterAction, LocationChangeAction} from 'react-router-redux';
+import { actionTypes } from '../common/constants/actionTypes';
+import { PositionEntityContainer } from '../model';
+
 export const actions = {
-  increment: createAction('INCREMENT'),
-  add: createAction('ADD', (amount: number) => ({
-    type: 'ADD',
-    payload: amount,
+  fetchedPositionAction: createAction(actionTypes.FETCH_MAP_POSITION, (mapPosition: {mapPosition: PositionEntityContainer}) => ({
+    type: actionTypes.FETCH_MAP_POSITION,
+    payload: mapPosition,
   })),
 };
 

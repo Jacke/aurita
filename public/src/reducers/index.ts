@@ -1,14 +1,11 @@
 import { combineReducers } from 'redux';
-import { MemberEntity } from '../model';
-import { membersReducer } from './members';
-import { memberReducer } from './member';
+import { PositionEntityContainer } from '../model';
+import { positionReducer } from './map_position';
 
 export interface State {
-  members: MemberEntity[];
-  member: MemberEntity;
+  mapPositions: PositionEntityContainer;
 };
 
 export const state = combineReducers<State>({
-  members: membersReducer,
-  member: memberReducer,
+  mapPositions: positionReducer,
 });

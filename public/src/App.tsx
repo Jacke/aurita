@@ -1,38 +1,48 @@
 import * as React from 'react';
 import './App.css';
-import GMap from './GMap'
+import GMap from './components/GMap'
 import axios from 'axios';
 //import * as WebSocket from 'ws'
+import { connect } from 'react-redux';
+import { fetchPositionAction, setNewMapPosition } from './api/map_position/fetchPosition';
+import { PositionEntityContainer, MapPosition } from './model';
 
-export interface MapPosition {
-    lat: number;
-    lng: number;
-}
-const defaultLatLng:MapPosition = {lat: -25.363, lng: 131.044}
+const defaultLatLng:MapPosition = {lat: -25.363, lng: 131.044};
 
-interface State {
-  localPosition: MapPosition;
-  globalPosition: MapPosition;
+interface State { mapPositions: PositionEntityContainer }
+interface Props {
+  fetchMembers: () => void;
+  setNewMapPosition: (position: PositionEntityContainer) => void;
+  mapPositions : PositionEntityContainer; 
 }
-interface Props {}
+
+const mapStateToProps = ((state: State) => {
+  console.log('state', state);
+  return { mapPositions: state.mapPositions }
+});
+
+const mapDispatchToProps = (dispatch: ((fn: any) => void)) => ({
+  fetchMembers: () => dispatch(fetchPositionAction()),
+  setNewMapPosition: (position: PositionEntityContainer) => dispatch(setNewMapPosition(position)),
+});
 
 class App extends React.Component<Props, State> {
   connection: any;
 
-  constructor(props: any) {
+  constructor(props: Props) {
     super(props);
-    this.state = {localPosition: {lat: 0, lng: 0}, globalPosition: {lat: 0, lng: 0} };
+    this.props.fetchMembers();
     if (WebSocket == undefined) {
       const WebSocket = {}; 
       console.log('Fallback for jest', WebSocket);
     } else {
-      this.connection = new WebSocket('ws://localhost:9002/stream');
-      this.connection.onmessage = (evt:any) => { 
+      this.connection = new WebSocket('ws://localhost:9000/stream');
+      this.connection.onmessage = (evt: any) => { 
         let newPosition:MapPosition = JSON.parse(evt.data)
         // Update position from websocket only if client has the old position
-        if (this.state.localPosition.lat != newPosition.lat && this.state.localPosition.lng != newPosition.lng) {
-          this.setState({localPosition: {lat: newPosition.lat, lng: newPosition.lng},
-                        globalPosition: {lat: newPosition.lat, lng: newPosition.lng} });
+        if (this.props.mapPositions.localPosition.lat != newPosition.lat && this.props.mapPositions.localPosition.lng != newPosition.lng) {
+          this.props.setNewMapPosition({localPosition: {lat: newPosition.lat, lng: newPosition.lng},
+                        globalPosition: {lat: newPosition.lat, lng: newPosition.lng} })          
         }
       };    
     }
@@ -41,15 +51,15 @@ class App extends React.Component<Props, State> {
   componentDidMount() {
     return axios.get(`/api/v1/mapPosition`)
       .then(res => {
-        this.setState({localPosition: res.data, globalPosition: res.data });
+        this.props.setNewMapPosition({localPosition: res.data, globalPosition: res.data })          
       }).catch(error => {
         console.log(error);
       });
   }
 
-  handleSave = (e: any) => {
-    this.connection.send(JSON.stringify(this.state.localPosition));
-    axios.post(`/api/v1/mapPosition/${this.state.localPosition.lat}/${this.state.localPosition.lng}`, {})
+  handleSave = (e: React.MouseEvent<HTMLElement>) => {
+    this.connection.send(JSON.stringify(this.props.mapPositions.localPosition));
+    axios.post(`/api/v1/mapPosition/${this.props.mapPositions.localPosition.lat}/${this.props.mapPositions.localPosition.lng}`, {})
     .then(function (response) {
       console.log(response);
     })
@@ -58,11 +68,17 @@ class App extends React.Component<Props, State> {
     });
   }
 
-  handleDefault = (e: any) => this.setState(prevState => ({localPosition: defaultLatLng, globalPosition: defaultLatLng }))
-  _onChange = (e: MapPosition) => this.setState({localPosition: e })
+  handleDefault = (e: React.MouseEvent<HTMLElement>) => {
+    this.props.setNewMapPosition({localPosition: defaultLatLng, globalPosition: defaultLatLng })          
+  }
+  _onChange = (e: MapPosition) => {
+    let newState = Object.assign({}, this.props.mapPositions, {localPosition: e });
+    this.props.setNewMapPosition(newState)  
+  }
 
 
   render() {
+    console.log('this.props.globalPosition', this.props);
     return (
       <div className="App">
         <header className="App-header">
@@ -77,8 +93,8 @@ class App extends React.Component<Props, State> {
         </header>
         <GMap 
           onChange={this._onChange} 
-          globalPosition={this.state.globalPosition}
-          localPosition={this.state.localPosition}
+          globalPosition={this.props.mapPositions.globalPosition}
+          localPosition={this.props.mapPositions.localPosition}
           defaultLatLng={defaultLatLng} />
         <p className="App-intro"></p>
       </div>
@@ -86,4 +102,8 @@ class App extends React.Component<Props, State> {
   }
 }
 
-export default App;
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(App);
