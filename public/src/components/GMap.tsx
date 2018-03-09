@@ -1,9 +1,10 @@
 import * as React from 'react';
-import {GoogleMap, withGoogleMap, withScriptjs } from 'react-google-maps'
+import {GoogleMap, withGoogleMap, withScriptjs, OverlayView, Marker, InfoWindow } from 'react-google-maps'
 import { compose, 
          withProps, 
          withState, 
-         withHandlers } from "recompose";
+         withHandlers,
+         withStateHandlers } from "recompose";
 import { MapPosition } from '../model';
 import HeatmapLayer from "react-google-maps/lib/components/visualization/HeatmapLayer";
 
@@ -15,10 +16,18 @@ interface GMapProps {
   defaultLatLng: MapPosition;
   ref?:any;
   onMapMounted?:any;
+  onToggleOpen?: any;
+  isOpen?: any;
 }
-interface GMapState {localPosition: any}
+interface GMapState {localPosition: any; }
 
 export const GOOGLE_MAP_URL = 'https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyBDdi6FWp1FF-aUJtE8DZyPJAlLtMMNwkE&libraries=visualization'
+
+const getPixelPositionOffset = (width:any, height:any) => ({
+  x: -(width / 2),
+  y: -(height / 2),
+})
+
 
 export default class GMap extends React.Component<GMapProps, GMapState> {
   constructor(props: GMapProps) {
@@ -42,6 +51,13 @@ export default class GMap extends React.Component<GMapProps, GMapState> {
           mapElement: <div style={{ height: `100%` }} />,
           onChange: this.props.onChange
         }),
+        withStateHandlers(() => ({
+          isOpen: false,
+        }), {
+          onToggleOpen: ({ isOpen }) => () => ({
+            isOpen: !isOpen,
+          })
+        }),        
         withState('position', 'onChange',  this.state.localPosition),
         withHandlers(() => {
           const refs = { map: undefined, }
@@ -63,6 +79,23 @@ export default class GMap extends React.Component<GMapProps, GMapState> {
                 onCenterChanged={props.onChange}
                 ref={props.onMapMounted}        
                 options={{disableDefaultUI: true}}>
+
+ <OverlayView
+      position={{ lat: -34.397, lng: 150.644 }}
+      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+      getPixelPositionOffset={getPixelPositionOffset}>
+      <div style={{ background: `white`, border: `1px solid #ccc`, padding: 15 }}></div>
+    </OverlayView>
+
+    <Marker
+      position={{ lat: -30.397, lng: 150.644 }}
+      onClick={props.onToggleOpen}
+    >
+      {props.isOpen && <InfoWindow onCloseClick={props.onToggleOpen}>
+        <b>Test</b>
+      </InfoWindow>}
+    </Marker>
+
                   <HeatmapLayer 
                     data = {[
                 new google.maps.LatLng(37.782551, -122.445368),
